@@ -34,7 +34,7 @@ export default function SimpleSelect({
 	};
 
 	return (
-		<div>
+		<div style={{ margin: "1.5rem 0" }}>
 			<FormControl className={classes.formControl}>
 				<InputLabel id="demo-simple-select-label">Month</InputLabel>
 				<Select
