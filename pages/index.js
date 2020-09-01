@@ -5,10 +5,10 @@ import MonthPicker from "../components/MonthPicker/MonthPicker";
 import moment from "moment";
 
 export default function Home() {
-	const [selectedDate, setSelectedDate] = useState(moment().format("MMM YYYY"));
-
-	const [selectedMonth, setSelectedMonth] = useState(moment().format("MM"));
-	const [selectedYear, setSelectedYear] = useState(moment().format("YYYY"));
+	const defaultMonth = Number(moment().format("MM")) - 1;
+	const defaultYear = Number(moment().format("YYYY"));
+	const [selectedMonth, setSelectedMonth] = useState(defaultMonth);
+	const [selectedYear, setSelectedYear] = useState(defaultYear);
 
 	return (
 		<div className="container">
@@ -19,11 +19,11 @@ export default function Home() {
 
 			<main>
 				<h1 className="title">
-					Welcome to <a href="https://nextjs.org">Next.js!</a>
+					Next <a href="#">Puppeteer</a>
 				</h1>
 				<MonthPicker
-					selectedDate={setSelectedDate}
-					setSelectedDate={setSelectedDate}
+					defaultMonth={defaultMonth}
+					defaultYear={defaultYear}
 					selectedMonth={selectedMonth}
 					setSelectedMonth={setSelectedMonth}
 					selectedYear={selectedYear}
