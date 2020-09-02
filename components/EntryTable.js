@@ -44,7 +44,7 @@ const useStyles = makeStyles({
 	},
 });
 
-export default function CustomizedTables() {
+export default function CustomizedTables({ daysInMonthArray = [] }) {
 	const classes = useStyles();
 
 	return (
@@ -52,23 +52,23 @@ export default function CustomizedTables() {
 			<Table className={classes.table} aria-label="customized table">
 				<TableHead>
 					<TableRow>
-						<StyledTableCell>Dessert (100g serving)</StyledTableCell>
+						<StyledTableCell>Date</StyledTableCell>
 						<StyledTableCell align="right">Calories</StyledTableCell>
 						<StyledTableCell align="right">Fat&nbsp;(g)</StyledTableCell>
 						<StyledTableCell align="right">Carbs&nbsp;(g)</StyledTableCell>
-						<StyledTableCell align="right">Protein&nbsp;(g)</StyledTableCell>
+						<StyledTableCell align="right">Total</StyledTableCell>
 					</TableRow>
 				</TableHead>
 				<TableBody>
-					{rows.map((row) => (
-						<StyledTableRow key={row.name}>
+					{daysInMonthArray.map((day, index) => (
+						<StyledTableRow key={index}>
 							<StyledTableCell component="th" scope="row">
-								{row.name}
+								{day}
 							</StyledTableCell>
-							<StyledTableCell align="right">{row.calories}</StyledTableCell>
-							<StyledTableCell align="right">{row.fat}</StyledTableCell>
-							<StyledTableCell align="right">{row.carbs}</StyledTableCell>
-							<StyledTableCell align="right">{row.protein}</StyledTableCell>
+							<StyledTableCell align="right">{day}</StyledTableCell>
+							<StyledTableCell align="right">{day}</StyledTableCell>
+							<StyledTableCell align="right">{day}</StyledTableCell>
+							<StyledTableCell align="right">{day}</StyledTableCell>
 						</StyledTableRow>
 					))}
 				</TableBody>
