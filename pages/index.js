@@ -1,9 +1,15 @@
 import Head from "next/head";
 import EntryTable from "../components/EntryTable";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import MonthPicker from "../components/MonthPicker/MonthPicker";
 import DateContext from "../components/context/DateContext";
+import styled from "styled-components";
 import moment from "moment";
+
+const Button = styled.button`
+	padding: 0.5rem;
+	margin-bottom: 1rem;
+`;
 
 export default function Home() {
 	const date = useContext(DateContext);
@@ -12,7 +18,11 @@ export default function Home() {
 	const defaultYear = Number(moment().format("YYYY"));
 	const [selectedMonth, setSelectedMonth] = useState(defaultMonth);
 	const [selectedYear, setSelectedYear] = useState(defaultYear);
-
+	const calculateTotal = () => {
+		date.daysInMonthArray.forEach((day) => {
+			console.log(document.querySelector(`#regular-${day}`).value);
+		});
+	};
 	return (
 		<div className="container">
 			<Head>
@@ -32,6 +42,9 @@ export default function Home() {
 					selectedYear={selectedYear}
 					setSelectedYear={setSelectedYear}
 				/>
+				<div style={{ display: "flex", width: "100%" }}>
+					<Button onClick={calculateTotal}>Calculate Totals</Button>
+				</div>
 				<EntryTable />
 			</main>
 

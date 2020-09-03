@@ -58,6 +58,7 @@ export default function CustomizedTables() {
 	// 	setDaysInMonthArray(getDaysInMonthArray(date.state.monthLength));
 	// 	// console.log(daysInMonth);
 	// }, [date.state.monthLength]);
+
 	return (
 		<TableContainer component={Paper}>
 			<Table className={classes.table} aria-label="customized table">
@@ -67,7 +68,7 @@ export default function CustomizedTables() {
 						<StyledTableCell align="center">Regular</StyledTableCell>
 						<StyledTableCell align="center">Premium</StyledTableCell>
 						<StyledTableCell align="right">Mid</StyledTableCell>
-						<StyledTableCell align="right">Total</StyledTableCell>
+						{/* <StyledTableCell align="right">Total</StyledTableCell> */}
 						<StyledTableCell align="center">Delivery</StyledTableCell>
 					</TableRow>
 				</TableHead>
@@ -83,8 +84,10 @@ export default function CustomizedTables() {
 							<StyledTableCell align="right">
 								<TextField cName={"premium-" + (index + 1)} />
 							</StyledTableCell>
-							<StyledTableCell align="right">{day}</StyledTableCell>
-							<StyledTableCell align="right">{day}</StyledTableCell>
+							<StyledTableCell id={`mid-${index + 1}`} align="right">
+								mid
+							</StyledTableCell>
+							{/* <StyledTableCell align="right">{day}</StyledTableCell> */}
 							<StyledTableCell align="right">
 								<TextField cName={"delivery-" + (index + 1)} />
 							</StyledTableCell>
