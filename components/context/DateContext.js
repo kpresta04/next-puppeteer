@@ -11,10 +11,26 @@ const DateContext = React.createContext({});
 
 const reducer = (state, action) => {
 	switch (action.type) {
-		case "INCREASE":
-			return state + 1;
-		case "DECREASE":
-			return state - 1;
+		case "CHANGE_MONTH":
+			state = {
+				...state,
+				month: action.month,
+				monthLength: moment(
+					`${state.year}-${action.month}`,
+					"YYYY-MM"
+				).daysInMonth(),
+			};
+			return state;
+		case "CHANGE_YEAR":
+			state = {
+				...state,
+				year: action.year,
+				monthLength: moment(
+					`${action.year}-${state.month}`,
+					"YYYY-MM"
+				).daysInMonth(),
+			};
+			return state;
 		case "INCREASE_BY":
 			return state + action.payload;
 		default:

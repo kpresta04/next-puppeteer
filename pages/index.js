@@ -4,14 +4,6 @@ import React, { useState, useEffect, useContext } from "react";
 import MonthPicker from "../components/MonthPicker/MonthPicker";
 import DateContext from "../components/context/DateContext";
 import moment from "moment";
-const getDaysInMonthArray = (monthLength) => {
-	const dayArray = [];
-	for (let i = 1; i <= monthLength; i++) {
-		dayArray.push(i);
-	}
-	// console.log(dayArray);
-	return dayArray;
-};
 
 export default function Home() {
 	const date = useContext(DateContext);
@@ -20,22 +12,6 @@ export default function Home() {
 	const defaultYear = Number(moment().format("YYYY"));
 	const [selectedMonth, setSelectedMonth] = useState(defaultMonth);
 	const [selectedYear, setSelectedYear] = useState(defaultYear);
-	const [daysInMonthArray, setDaysInMonthArray] = useState(
-		getDaysInMonthArray(
-			moment(`${defaultYear}-${defaultMonth}`, "YYYY-MM").daysInMonth()
-		)
-	);
-
-	useEffect(() => {
-		// console.log(selectedMonth, selectedYear);
-
-		setDaysInMonthArray(
-			getDaysInMonthArray(
-				moment(`${selectedYear}-${selectedMonth}`, "YYYY-MM").daysInMonth()
-			)
-		);
-		// console.log(daysInMonth);
-	}, [selectedMonth]);
 
 	return (
 		<div className="container">
@@ -56,7 +32,7 @@ export default function Home() {
 					selectedYear={selectedYear}
 					setSelectedYear={setSelectedYear}
 				/>
-				<EntryTable daysInMonthArray={daysInMonthArray} />
+				<EntryTable />
 			</main>
 
 			<style jsx>{`

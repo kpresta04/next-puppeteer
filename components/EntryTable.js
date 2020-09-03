@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -7,6 +7,16 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
+import DateContext from "./context/DateContext";
+
+const getDaysInMonthArray = (monthLength) => {
+	const dayArray = [];
+	for (let i = 1; i <= monthLength; i++) {
+		dayArray.push(i);
+	}
+	// console.log(dayArray);
+	return dayArray;
+};
 
 const StyledTableCell = withStyles((theme) => ({
 	head: {
@@ -44,9 +54,18 @@ const useStyles = makeStyles({
 	},
 });
 
-export default function CustomizedTables({ daysInMonthArray = [] }) {
+export default function CustomizedTables() {
 	const classes = useStyles();
+	const date = useContext(DateContext);
+	const [daysInMonthArray, setDaysInMonthArray] = useState(
+		getDaysInMonthArray(date.state.monthLength)
+	);
+	useEffect(() => {
+		// console.log(selectedMonth, selectedYear);
 
+		setDaysInMonthArray(getDaysInMonthArray(date.state.monthLength));
+		// console.log(daysInMonth);
+	}, [date.state.monthLength]);
 	return (
 		<TableContainer component={Paper}>
 			<Table className={classes.table} aria-label="customized table">

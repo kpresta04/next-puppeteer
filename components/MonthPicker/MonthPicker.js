@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
+import DateContext from "../context/DateContext";
 
 const useStyles = makeStyles((theme) => ({
 	formControl: {
@@ -24,13 +25,16 @@ export default function SimpleSelect({
 	selectedYear,
 	setSelectedYear,
 }) {
+	const date = useContext(DateContext);
 	const classes = useStyles();
 
 	const handleChangeMonth = (event) => {
 		setSelectedMonth(event.target.value);
+		date.dispatch({ type: "CHANGE_MONTH", month: event.target.value });
 	};
 	const handleChangeYear = (event) => {
 		setSelectedYear(event.target.value);
+		date.dispatch({ type: "CHANGE_YEAR", year: event.target.value });
 	};
 
 	return (
