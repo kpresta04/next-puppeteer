@@ -8,15 +8,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import DateContext from "./context/DateContext";
-
-const getDaysInMonthArray = (monthLength) => {
-	const dayArray = [];
-	for (let i = 1; i <= monthLength; i++) {
-		dayArray.push(i);
-	}
-	// console.log(dayArray);
-	return dayArray;
-};
+import TextField from "./TextField/TextField";
 
 const StyledTableCell = withStyles((theme) => ({
 	head: {
@@ -57,37 +49,45 @@ const useStyles = makeStyles({
 export default function CustomizedTables() {
 	const classes = useStyles();
 	const date = useContext(DateContext);
-	const [daysInMonthArray, setDaysInMonthArray] = useState(
-		getDaysInMonthArray(date.state.monthLength)
-	);
-	useEffect(() => {
-		// console.log(selectedMonth, selectedYear);
+	// const [daysInMonthArray, setDaysInMonthArray] = useState(
+	// 	getDaysInMonthArray(date.state.monthLength)
+	// );
+	// useEffect(() => {
+	// 	// console.log(selectedMonth, selectedYear);
 
-		setDaysInMonthArray(getDaysInMonthArray(date.state.monthLength));
-		// console.log(daysInMonth);
-	}, [date.state.monthLength]);
+	// 	setDaysInMonthArray(getDaysInMonthArray(date.state.monthLength));
+	// 	// console.log(daysInMonth);
+	// }, [date.state.monthLength]);
 	return (
 		<TableContainer component={Paper}>
 			<Table className={classes.table} aria-label="customized table">
 				<TableHead>
 					<TableRow>
 						<StyledTableCell>Date</StyledTableCell>
-						<StyledTableCell align="right">Calories</StyledTableCell>
-						<StyledTableCell align="right">Fat&nbsp;(g)</StyledTableCell>
-						<StyledTableCell align="right">Carbs&nbsp;(g)</StyledTableCell>
+						<StyledTableCell align="center">Regular</StyledTableCell>
+						<StyledTableCell align="center">Premium</StyledTableCell>
+						<StyledTableCell align="right">Mid</StyledTableCell>
 						<StyledTableCell align="right">Total</StyledTableCell>
+						<StyledTableCell align="center">Delivery</StyledTableCell>
 					</TableRow>
 				</TableHead>
 				<TableBody>
-					{daysInMonthArray.map((day, index) => (
+					{date.state.daysInMonthArray.map((day, index) => (
 						<StyledTableRow key={index}>
 							<StyledTableCell component="th" scope="row">
-								{day}
+								{date.state.month}/{day}/{date.state.year}
+							</StyledTableCell>
+							<StyledTableCell align="right">
+								<TextField cName={"regular-" + (index + 1)} />
+							</StyledTableCell>
+							<StyledTableCell align="right">
+								<TextField cName={"premium-" + (index + 1)} />
 							</StyledTableCell>
 							<StyledTableCell align="right">{day}</StyledTableCell>
 							<StyledTableCell align="right">{day}</StyledTableCell>
-							<StyledTableCell align="right">{day}</StyledTableCell>
-							<StyledTableCell align="right">{day}</StyledTableCell>
+							<StyledTableCell align="right">
+								<TextField cName={"delivery-" + (index + 1)} />
+							</StyledTableCell>
 						</StyledTableRow>
 					))}
 				</TableBody>

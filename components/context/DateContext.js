@@ -9,6 +9,15 @@ const defaultMonthLength = moment(
 ).daysInMonth();
 const DateContext = React.createContext({});
 
+const getDaysInMonthArray = (monthLength) => {
+	const dayArray = [];
+	for (let i = 1; i <= monthLength; i++) {
+		dayArray.push(i);
+	}
+	// console.log(dayArray);
+	return dayArray;
+};
+
 const reducer = (state, action) => {
 	switch (action.type) {
 		case "CHANGE_MONTH":
@@ -19,6 +28,9 @@ const reducer = (state, action) => {
 					`${state.year}-${action.month}`,
 					"YYYY-MM"
 				).daysInMonth(),
+				daysInMonthArray: getDaysInMonthArray(
+					moment(`${state.year}-${action.month}`, "YYYY-MM").daysInMonth()
+				),
 			};
 			return state;
 		case "CHANGE_YEAR":
@@ -29,6 +41,9 @@ const reducer = (state, action) => {
 					`${action.year}-${state.month}`,
 					"YYYY-MM"
 				).daysInMonth(),
+				daysInMonthArray: getDaysInMonthArray(
+					moment(`${action.year}-${state.month}`, "YYYY-MM").daysInMonth()
+				),
 			};
 			return state;
 		case "INCREASE_BY":
@@ -43,6 +58,7 @@ export const DateProvider = ({ children }) => {
 		month: defaultMonth,
 		year: defaultYear,
 		monthLength: defaultMonthLength,
+		daysInMonthArray: getDaysInMonthArray(defaultMonthLength),
 	});
 	return (
 		<DateContext.Provider value={{ state, dispatch }}>
