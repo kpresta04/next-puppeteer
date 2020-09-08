@@ -5,6 +5,7 @@ import MonthPicker from "../components/MonthPicker/MonthPicker";
 import DateContext from "../components/context/DateContext";
 import styled from "styled-components";
 import moment from "moment";
+import Axios from "axios";
 
 const Button = styled.button`
 	padding: 0.5rem;
@@ -18,8 +19,11 @@ export default function Home() {
 	const defaultYear = Number(moment().format("YYYY"));
 	const [selectedMonth, setSelectedMonth] = useState(defaultMonth);
 	const [selectedYear, setSelectedYear] = useState(defaultYear);
+	const createSpreadsheet = () => {
+		Axios.post("/api/test", { ...date.state });
+	};
 	const calculateTotal = () => {
-		date.daysInMonthArray.forEach((day) => {
+		date.state.daysInMonthArray.forEach((day) => {
 			console.log(document.querySelector(`#regular-${day}`).value);
 		});
 	};
@@ -43,7 +47,7 @@ export default function Home() {
 					setSelectedYear={setSelectedYear}
 				/>
 				<div style={{ display: "flex", width: "100%" }}>
-					<Button onClick={calculateTotal}>Calculate Totals</Button>
+					<Button onClick={createSpreadsheet}>Create Spreadsheet</Button>
 				</div>
 				<EntryTable />
 			</main>

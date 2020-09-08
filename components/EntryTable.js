@@ -66,8 +66,8 @@ export default function CustomizedTables() {
 					<TableRow>
 						<StyledTableCell>Date</StyledTableCell>
 						<StyledTableCell align="center">Regular</StyledTableCell>
+						<StyledTableCell align="center">Mid</StyledTableCell>
 						<StyledTableCell align="center">Premium</StyledTableCell>
-						<StyledTableCell align="right">Mid</StyledTableCell>
 						{/* <StyledTableCell align="right">Total</StyledTableCell> */}
 						<StyledTableCell align="center">Delivery</StyledTableCell>
 					</TableRow>
@@ -82,10 +82,10 @@ export default function CustomizedTables() {
 								<TextField cName={"regular-" + (index + 1)} />
 							</StyledTableCell>
 							<StyledTableCell align="right">
-								<TextField cName={"premium-" + (index + 1)} />
+								<TextField cName={"mid-" + (index + 1)} />
 							</StyledTableCell>
-							<StyledTableCell id={`mid-${index + 1}`} align="right">
-								mid
+							<StyledTableCell align="right">
+								<TextField cName={"premium-" + (index + 1)} />
 							</StyledTableCell>
 							{/* <StyledTableCell align="right">{day}</StyledTableCell> */}
 							<StyledTableCell align="right">
