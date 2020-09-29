@@ -20,13 +20,48 @@ export default function Home() {
 	const [selectedMonth, setSelectedMonth] = useState(defaultMonth);
 	const [selectedYear, setSelectedYear] = useState(defaultYear);
 	const createSpreadsheet = () => {
-		Axios.post("/api/test", { ...date.state });
-	};
-	const calculateTotal = () => {
-		date.state.daysInMonthArray.forEach((day) => {
-			console.log(document.querySelector(`#regular-${day}`).value);
+		const deliveries = calculateDeliveries();
+		const mid = calculateMid();
+		const regularTotal = calculateTotal("regular", mid);
+		const premiumTotal = calculateTotal("premium", mid);
+		Axios.post("/api/test", {
+			...date.state,
+			deliveries,
+			mid,
+			regularTotal,
+			premiumTotal,
 		});
 	};
+	const calculateDeliveries = () => {
+		const result = [];
+		date.state.daysInMonthArray.forEach((day) => {
+			result.push(Number(document.querySelector(`#delivery-${day}`).value));
+		});
+
+		return result;
+	};
+	const calculateMid = () => {
+		const result = [];
+		date.state.daysInMonthArray.forEach((day) => {
+			result.push(parseFloat(document.querySelector(`#mid-${day}`).value / 2));
+		});
+
+		return result;
+	};
+	const calculateTotal = (columnName, midArray) => {
+		//columnName (str) = regular or premium
+
+		const result = [];
+		date.state.daysInMonthArray.forEach((day, index) => {
+			result.push(
+				Number(document.querySelector(`#${columnName}-${day}`).value) +
+					midArray[index]
+			);
+		});
+
+		return result;
+	};
+
 	return (
 		<div className="container">
 			<Head>

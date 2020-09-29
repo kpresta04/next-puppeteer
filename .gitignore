@@ -30,3 +30,5 @@ yarn-error.log*
 .env.production.local
 DAFILETEST.xlsx
 .~lock.DAFILETEST.xlsx#
+.~lock.LQ.7.2020.xlsx#
+LQ.*
