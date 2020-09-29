@@ -26,6 +26,13 @@ export default function Home() {
 		const mid = calculateMid();
 		const regularTotal = calculateTotal("regular", mid);
 		const premiumTotal = calculateTotal("premium", mid);
+		const lastMonthBalance = Number(
+			document.querySelector(`#lastMonthBalance`).value
+		);
+		const lastMonthBalancePrem = Number(
+			document.querySelector(`#lastMonthBalancePrem`).value
+		);
+
 		Axios.post("/api/test", {
 			...date.state,
 			regDeliv,
@@ -33,6 +40,8 @@ export default function Home() {
 			mid,
 			regularTotal,
 			premiumTotal,
+			lastMonthBalance,
+			lastMonthBalancePrem,
 		});
 	};
 	const calculateDeliveries = (delivColumn = "delivery") => {
@@ -86,8 +95,29 @@ export default function Home() {
 					selectedYear={selectedYear}
 					setSelectedYear={setSelectedYear}
 				/>
-				<div style={{ display: "flex", width: "100%" }}>
+				<div
+					style={{
+						display: "flex",
+						width: "100%",
+
+						marginBottom: "1rem",
+					}}
+				>
 					<Button onClick={createSpreadsheet}>Create Spreadsheet</Button>
+				</div>
+				<div style={{ width: "100%", marginBottom: "1rem" }}>
+					<label htmlFor="lastMonthBalance">Last Month Regular</label>
+					<input
+						style={{ margin: "0 1rem" }}
+						id="lastMonthBalance"
+						type="number"
+					/>
+					<label htmlFor="lastMonthBalancePrem">Last Month Premium</label>
+					<input
+						style={{ margin: "0 1rem" }}
+						id="lastMonthBalancePrem"
+						type="number"
+					/>
 				</div>
 				<EntryTable />
 			</main>

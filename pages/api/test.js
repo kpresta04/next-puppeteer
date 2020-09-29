@@ -26,6 +26,22 @@ export default (req, res) => {
 	const RegSheet = workbook.addWorksheet("Regular");
 	const PremiumSheet = workbook.addWorksheet("Premium");
 
+	const formulas = ["f-e", "e", "b+c-d"];
+	const getFormula = (formula, index) => {
+		switch (formula) {
+			case "f-e":
+				return `f${index}-e${index}`;
+			case "e":
+				if (index - 1 > 1) {
+					return `e${index - 1}`;
+				} else {
+					return 0;
+				}
+			case "b+c-d": {
+				return `b${index}+c${index}-d${index}`;
+			}
+		}
+	};
 	const addDates = (sheet) => {
 		const worksheet = workbook.getWorksheet(sheet);
 		for (let i = 1; i <= state.monthLength; i++) {
@@ -44,6 +60,18 @@ export default (req, res) => {
 			cell.value = valuesToInsert[i - 1];
 		}
 	};
+	const quickFixes = (sheet = "Regular") => {
+		const worksheet = workbook.getWorksheet(sheet);
+
+		let cell = worksheet.getCell("B2");
+
+		// Modify/Add individual cell
+		if (sheet === "Regular") {
+			cell.value = state.lastMonthBalance;
+		} else {
+			cell.value = state.lastMonthBalancePrem;
+		}
+	};
 	const insertFormulas = (sheet = "Regular", column = "G", formula = "f-e") => {
 		const worksheet = workbook.getWorksheet(sheet);
 		for (let i = 1; i <= state.monthLength; i++) {
@@ -51,11 +79,11 @@ export default (req, res) => {
 
 			// Modify/Add individual cell
 			cell.value = {
-				formula: `${formula[0]}${i + 1}${formula[1]}${formula[2]}${i + 1}`,
+				formula: getFormula(formula, i + 1),
 			};
 		}
 		if (sheet === "Regular") {
-			insertFormulas("Premium");
+			insertFormulas("Premium", column, formula);
 		}
 	};
 
@@ -295,7 +323,15 @@ export default (req, res) => {
 	addDates("Regular");
 	addDates("Premium");
 	insertValues("Regular", "C", state.regDeliv);
+	insertValues("Premium", "C", state.premDeliv);
+	insertValues("Regular", "D", state.regularTotal);
+	insertValues("Premium", "D", state.premiumTotal);
+
 	insertFormulas();
+	insertFormulas("Regular", "B", formulas[1]);
+	insertFormulas("Regular", "E", formulas[2]);
+	quickFixes();
+	quickFixes("Premium");
 
 	const fileName = `LQ.${state.month}.${state.year}` + ".xlsx";
 	workbook.xlsx.writeFile(fileName);
