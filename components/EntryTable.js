@@ -69,7 +69,8 @@ export default function CustomizedTables() {
 						<StyledTableCell align="center">Mid</StyledTableCell>
 						<StyledTableCell align="center">Premium</StyledTableCell>
 						{/* <StyledTableCell align="right">Total</StyledTableCell> */}
-						<StyledTableCell align="center">Delivery</StyledTableCell>
+						<StyledTableCell align="center">Regular Delivery</StyledTableCell>
+						<StyledTableCell align="center">Premium Delivery</StyledTableCell>
 					</TableRow>
 				</TableHead>
 				<TableBody>
@@ -90,6 +91,9 @@ export default function CustomizedTables() {
 							{/* <StyledTableCell align="right">{day}</StyledTableCell> */}
 							<StyledTableCell align="right">
 								<TextField cName={"delivery-" + (index + 1)} />
+							</StyledTableCell>
+							<StyledTableCell align="right">
+								<TextField cName={"premDeliv-" + (index + 1)} />
 							</StyledTableCell>
 						</StyledTableRow>
 					))}

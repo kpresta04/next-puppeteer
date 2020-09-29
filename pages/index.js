@@ -20,22 +20,27 @@ export default function Home() {
 	const [selectedMonth, setSelectedMonth] = useState(defaultMonth);
 	const [selectedYear, setSelectedYear] = useState(defaultYear);
 	const createSpreadsheet = () => {
-		const deliveries = calculateDeliveries();
+		const regDeliv = calculateDeliveries();
+		const premDeliv = calculateDeliveries("premDeliv");
+
 		const mid = calculateMid();
 		const regularTotal = calculateTotal("regular", mid);
 		const premiumTotal = calculateTotal("premium", mid);
 		Axios.post("/api/test", {
 			...date.state,
-			deliveries,
+			regDeliv,
+			premDeliv,
 			mid,
 			regularTotal,
 			premiumTotal,
 		});
 	};
-	const calculateDeliveries = () => {
+	const calculateDeliveries = (delivColumn = "delivery") => {
 		const result = [];
 		date.state.daysInMonthArray.forEach((day) => {
-			result.push(Number(document.querySelector(`#delivery-${day}`).value));
+			result.push(
+				Number(document.querySelector(`#${delivColumn}-${day}`).value)
+			);
 		});
 
 		return result;

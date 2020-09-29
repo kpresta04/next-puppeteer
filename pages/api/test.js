@@ -44,6 +44,20 @@ export default (req, res) => {
 			cell.value = valuesToInsert[i - 1];
 		}
 	};
+	const insertFormulas = (sheet = "Regular", column = "G", formula = "f-e") => {
+		const worksheet = workbook.getWorksheet(sheet);
+		for (let i = 1; i <= state.monthLength; i++) {
+			let cell = worksheet.getCell(`${column}${i + 1}`);
+
+			// Modify/Add individual cell
+			cell.value = {
+				formula: `${formula[0]}${i + 1}${formula[1]}${formula[2]}${i + 1}`,
+			};
+		}
+		if (sheet === "Regular") {
+			insertFormulas("Premium");
+		}
+	};
 
 	RegSheet.columns = [
 		{
@@ -280,7 +294,8 @@ export default (req, res) => {
 
 	addDates("Regular");
 	addDates("Premium");
-	insertValues("Regular", "C", state.deliveries);
+	insertValues("Regular", "C", state.regDeliv);
+	insertFormulas();
 
 	const fileName = `LQ.${state.month}.${state.year}` + ".xlsx";
 	workbook.xlsx.writeFile(fileName);
