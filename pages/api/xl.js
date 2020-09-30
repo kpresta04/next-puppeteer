@@ -62,9 +62,16 @@ export default (req, res) => {
 		cell.value = valuesToInsert[i - 1];
 		// }
 	};
-	const getRandomInt = (min, max) => {
-		min = Math.ceil(min);
-		max = Math.floor(max);
+	const getRandomInt = (sheet) => {
+		let min = 0;
+		let max = 0;
+		if (sheet === "Regular") {
+			min = Math.ceil(-15);
+			max = Math.floor(10);
+		} else {
+			min = Math.ceil(-10);
+			max = Math.floor(10);
+		}
 		return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 	};
 	const insertDips = (sheet = "Regular", i) => {
@@ -73,10 +80,39 @@ export default (req, res) => {
 		let endBal = worksheet.getCell(`E${i + 1}`).value;
 
 		let cell = worksheet.getCell(`F${i + 1}`);
-		cell.value = endBal + getRandomInt(-20, 10);
 
+		cell.value = endBal + getRandomInt(sheet);
 		if (sheet === "Regular") {
 			insertDips("Premium", i);
+		}
+	};
+	const insertOffset = (sheet = "Regular", i) => {
+		const worksheet = workbook.getWorksheet(sheet);
+
+		const endBal = worksheet.getCell(`E${i + 1}`).value;
+
+		const dips = worksheet.getCell(`F${i + 1}`).value;
+		const cell = worksheet.getCell(`G${i + 1}`);
+		cell.value = dips - endBal;
+
+		if (sheet === "Regular") {
+			insertOffset("Premium", i);
+		}
+	};
+	const insertMTDOffset = (sheet = "Regular", i) => {
+		const worksheet = workbook.getWorksheet(sheet);
+		if (i + 1 === 2) {
+			const offset = worksheet.getCell("G2").value;
+			const MTDCell = worksheet.getCell("H2");
+			MTDCell.value = offset;
+		} else {
+			const offset = worksheet.getCell(`G${i + 1}`).value;
+			const prevMTD = worksheet.getCell(`H${i}`).value;
+			const cell = worksheet.getCell(`H${i + 1}`);
+			cell.value = prevMTD + offset;
+		}
+		if (sheet === "Regular") {
+			insertMTDOffset("Premium", i);
 		}
 	};
 	const quickFixes = (sheet = "Regular") => {
@@ -128,6 +164,8 @@ export default (req, res) => {
 			insertEndBalance("Premium", i);
 
 			insertDips("Regular", i);
+			insertOffset("Regular", i);
+			insertMTDOffset("Regular", i);
 		}
 	};
 	const insertEndBalance = (sheet = "Regular", i) => {
