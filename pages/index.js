@@ -5,7 +5,6 @@ import MonthPicker from "../components/MonthPicker/MonthPicker";
 import DateContext from "../components/context/DateContext";
 import styled from "styled-components";
 import moment from "moment";
-import Axios from "axios";
 
 const Button = styled.button`
 	padding: 0.5rem;
@@ -33,15 +32,22 @@ export default function Home() {
 			document.querySelector(`#lastMonthBalancePrem`).value
 		);
 
-		Axios.post("/api/xl", {
-			...date.state,
-			regDeliv,
-			premDeliv,
-			mid,
-			regularTotal,
-			premiumTotal,
-			lastMonthBalance,
-			lastMonthBalancePrem,
+		fetch("/api/xl", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				// 'Content-Type': 'application/x-www-form-urlencoded',
+			},
+			body: JSON.stringify({
+				...date.state,
+				regDeliv,
+				premDeliv,
+				mid,
+				regularTotal,
+				premiumTotal,
+				lastMonthBalance,
+				lastMonthBalancePrem,
+			}),
 		});
 	};
 	const calculateDeliveries = (delivColumn = "delivery") => {
