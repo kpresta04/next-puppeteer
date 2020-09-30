@@ -70,7 +70,7 @@ export default (req, res) => {
 	const insertDips = (sheet = "Regular", i) => {
 		const worksheet = workbook.getWorksheet(sheet);
 
-		let endBal = worksheet.getCell(`E${i + 1}`).result;
+		let endBal = worksheet.getCell(`E${i + 1}`).value;
 
 		let cell = worksheet.getCell(`F${i + 1}`);
 		cell.value = endBal + getRandomInt(-20, 10);
@@ -127,7 +127,7 @@ export default (req, res) => {
 			insertEndBalance("Regular", i);
 			insertEndBalance("Premium", i);
 
-			// insertDips("Regular", i);
+			insertDips("Regular", i);
 		}
 	};
 	const insertEndBalance = (sheet = "Regular", i) => {
@@ -148,7 +148,7 @@ export default (req, res) => {
 	const insertBeginBalance = (sheet = "Regular", i) => {
 		if (i + 1 !== 2) {
 			const worksheet = workbook.getWorksheet(sheet);
-			const eCell = worksheet.getCell(`E${i}`);
+			const eCell = worksheet.getCell(`F${i}`);
 			const cell = worksheet.getCell(`B${i + 1}`);
 
 			cell.value = eCell.value;
