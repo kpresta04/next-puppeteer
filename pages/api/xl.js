@@ -26,7 +26,7 @@ export default (req, res) => {
 	const RegSheet = workbook.addWorksheet("Regular");
 	const PremiumSheet = workbook.addWorksheet("Premium");
 
-	const formulas = ["f-e", "e", "b+c-d"];
+	const formulas = ["f-e", "e", "b+c-d", "g+h"];
 	const getFormula = (formula, index) => {
 		switch (formula) {
 			case "f-e":
@@ -37,9 +37,11 @@ export default (req, res) => {
 				} else {
 					return 0;
 				}
-			case "b+c-d": {
+			case "b+c-d":
 				return `b${index}+c${index}-d${index}`;
-			}
+
+			case "g+h":
+				return `g${index}+h${index - 1}`;
 		}
 	};
 	const addDates = (sheet) => {
@@ -51,13 +53,28 @@ export default (req, res) => {
 			cell.value = state.month + "/" + i + "/" + state.year;
 		}
 	};
-	const insertValues = (sheet, column, valuesToInsert) => {
+	const insertValue = (sheet, column, valuesToInsert, i) => {
+		const worksheet = workbook.getWorksheet(sheet);
+		// for (let i = 1; i <= state.monthLength; i++) {
+		let cell = worksheet.getCell(`${column}${i + 1}`);
+
+		// Modify/Add individual cell
+		cell.value = valuesToInsert[i - 1];
+		// }
+	};
+	const getRandomInt = (min, max) => {
+		min = Math.ceil(min);
+		max = Math.floor(max);
+		return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+	};
+	const insertDips = (sheet = "Regular") => {
 		const worksheet = workbook.getWorksheet(sheet);
 		for (let i = 1; i <= state.monthLength; i++) {
-			let cell = worksheet.getCell(`${column}${i + 1}`);
+			let endBal = worksheet.getCell(`E${i + 1}`).result;
 
-			// Modify/Add individual cell
-			cell.value = valuesToInsert[i - 1];
+			let cell = worksheet.getCell(`F${i + 1}`);
+			// cell.value = endBal + getRandomInt(-20, 10);
+			console.log(endBal);
 		}
 	};
 	const quickFixes = (sheet = "Regular") => {
@@ -71,19 +88,61 @@ export default (req, res) => {
 		} else {
 			cell.value = state.lastMonthBalancePrem;
 		}
+		cell = worksheet.getCell("H2");
+		cell.value = {
+			formula: "=G2",
+		};
 	};
-	const insertFormulas = (sheet = "Regular", column = "G", formula = "f-e") => {
-		const worksheet = workbook.getWorksheet(sheet);
-		for (let i = 1; i <= state.monthLength; i++) {
-			let cell = worksheet.getCell(`${column}${i + 1}`);
 
-			// Modify/Add individual cell
-			cell.value = {
-				formula: getFormula(formula, i + 1),
-			};
+	const insertRows = (sheet = "Regular", index) => {
+		const worksheet = workbook.getWorksheet(sheet);
+		const premSheet = workbook.getWorksheet("Premium");
+		for (let i = 1; i <= state.monthLength; i++) {
+			insertValue("Regular", "C", state.regDeliv, i);
+			insertValue("Premium", "C", state.premDeliv, i);
+			insertValue("Regular", "D", state.regularTotal, i);
+			insertValue("Premium", "D", state.premiumTotal, i);
+			if (i + 1 === 2) {
+				let customCell = worksheet.getCell("B2");
+				customCell.value = state.lastMonthBalance;
+				customCell = premSheet.getCell("B2");
+				customCell.value = state.lastMonthBalancePrem;
+			}
+			insertEndBalance("Regular", i);
 		}
+	};
+	const insertEndBalance = (sheet = "Regular", i) => {
+		const worksheet = workbook.getWorksheet(sheet);
+		const cell = worksheet.getCell(`E${i + 1}`);
+		const bCell = worksheet.getCell(`B${i + 1}`);
+		const cCell = worksheet.getCell(`C${i + 1}`);
+		const dCell = worksheet.getCell(`D${i + 1}`);
+
+		cell.value = {
+			formula: getFormula(formulas[2], i + 1),
+			result: bCell + cCell - dCell,
+		};
 		if (sheet === "Regular") {
-			insertFormulas("Premium", column, formula);
+			insertEndBalance("Premium", i);
+		}
+	};
+	const insertFormulas = (
+		sheet = "Regular",
+		column = "G",
+		formula = "f-e",
+		i
+	) => {
+		const worksheet = workbook.getWorksheet(sheet);
+		// for (let i = 1; i <= state.monthLength; i++) {
+		let cell = worksheet.getCell(`${column}${i + 1}`);
+
+		// Modify/Add individual cell
+		cell.value = {
+			formula: getFormula(formula, i + 1),
+		};
+		// }
+		if (sheet === "Regular") {
+			insertFormulas("Premium", column, formula, i);
 		}
 	};
 
@@ -322,16 +381,21 @@ export default (req, res) => {
 
 	addDates("Regular");
 	addDates("Premium");
-	insertValues("Regular", "C", state.regDeliv);
-	insertValues("Premium", "C", state.premDeliv);
-	insertValues("Regular", "D", state.regularTotal);
-	insertValues("Premium", "D", state.premiumTotal);
+	// insertValues("Regular", "C", state.regDeliv);
+	// insertValues("Premium", "C", state.premDeliv);
+	// insertValues("Regular", "D", state.regularTotal);
+	// insertValues("Premium", "D", state.premiumTotal);
 
-	insertFormulas();
-	insertFormulas("Regular", "B", formulas[1]);
-	insertFormulas("Regular", "E", formulas[2]);
-	quickFixes();
-	quickFixes("Premium");
+	// insertFormulas();
+	// insertFormulas("Regular", "B", formulas[1]);
+	// insertFormulas("Regular", "E", formulas[2]);
+	// insertFormulas("Regular", "E", formulas[2]);
+	// insertFormulas("Regular", "H", formulas[3]);
+
+	// quickFixes();
+	// quickFixes("Premium");
+	// insertDips();
+	insertRows();
 
 	const fileName = `LQ.${state.month}.${state.year}` + ".xlsx";
 	workbook.xlsx.writeFile(fileName);

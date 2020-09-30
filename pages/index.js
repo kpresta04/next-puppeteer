@@ -33,7 +33,7 @@ export default function Home() {
 			document.querySelector(`#lastMonthBalancePrem`).value
 		);
 
-		Axios.post("/api/test", {
+		Axios.post("/api/xl", {
 			...date.state,
 			regDeliv,
 			premDeliv,
