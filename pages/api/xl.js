@@ -67,14 +67,16 @@ export default (req, res) => {
 		max = Math.floor(max);
 		return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 	};
-	const insertDips = (sheet = "Regular") => {
+	const insertDips = (sheet = "Regular", i) => {
 		const worksheet = workbook.getWorksheet(sheet);
-		for (let i = 1; i <= state.monthLength; i++) {
-			let endBal = worksheet.getCell(`E${i + 1}`).result;
 
-			let cell = worksheet.getCell(`F${i + 1}`);
-			// cell.value = endBal + getRandomInt(-20, 10);
-			console.log(endBal);
+		let endBal = worksheet.getCell(`E${i + 1}`).result;
+
+		let cell = worksheet.getCell(`F${i + 1}`);
+		cell.value = endBal + getRandomInt(-20, 10);
+
+		if (sheet === "Regular") {
+			insertDips("Premium", i);
 		}
 	};
 	const quickFixes = (sheet = "Regular") => {
@@ -94,7 +96,7 @@ export default (req, res) => {
 		};
 	};
 
-	const insertRows = (sheet = "Regular", index) => {
+	const insertRows = async (sheet = "Regular", index) => {
 		const worksheet = workbook.getWorksheet(sheet);
 		const premSheet = workbook.getWorksheet("Premium");
 		for (let i = 1; i <= state.monthLength; i++) {
@@ -103,27 +105,53 @@ export default (req, res) => {
 			insertValue("Regular", "D", state.regularTotal, i);
 			insertValue("Premium", "D", state.premiumTotal, i);
 			if (i + 1 === 2) {
-				let customCell = worksheet.getCell("B2");
+				const customCell = worksheet.getCell("B2");
 				customCell.value = state.lastMonthBalance;
-				customCell = premSheet.getCell("B2");
-				customCell.value = state.lastMonthBalancePrem;
+				const customCellPrem = premSheet.getCell("B2");
+				customCellPrem.value = state.lastMonthBalancePrem;
+				const eCell = worksheet.getCell("E2");
+				eCell.value =
+					customCell.value +
+					worksheet.getCell("C2").value -
+					worksheet.getCell("D2").value;
+
+				const eCellPrem = premSheet.getCell("E2");
+				eCellPrem.value =
+					customCellPrem.value +
+					premSheet.getCell("C2").value -
+					premSheet.getCell("D2").value;
+			} else {
+				insertBeginBalance("Regular", i);
+				insertBeginBalance("Premium", i);
 			}
 			insertEndBalance("Regular", i);
+			insertEndBalance("Premium", i);
+
+			// insertDips("Regular", i);
 		}
 	};
 	const insertEndBalance = (sheet = "Regular", i) => {
-		const worksheet = workbook.getWorksheet(sheet);
-		const cell = worksheet.getCell(`E${i + 1}`);
-		const bCell = worksheet.getCell(`B${i + 1}`);
-		const cCell = worksheet.getCell(`C${i + 1}`);
-		const dCell = worksheet.getCell(`D${i + 1}`);
+		if (i + 1 !== 2) {
+			const worksheet = workbook.getWorksheet(sheet);
+			const cell = worksheet.getCell(`E${i + 1}`);
+			const bCell = worksheet.getCell(`B${i + 1}`);
+			const cCell = worksheet.getCell(`C${i + 1}`);
+			const dCell = worksheet.getCell(`D${i + 1}`);
 
-		cell.value = {
-			formula: getFormula(formulas[2], i + 1),
-			result: bCell + cCell - dCell,
-		};
-		if (sheet === "Regular") {
-			insertEndBalance("Premium", i);
+			// console.log("value: " + bCell.value);
+
+			// console.log("result: " + JSON.stringify(bCell.value));
+			// console.log(bCell.value);
+			cell.value = bCell.value + cCell.value - dCell.value;
+		}
+	};
+	const insertBeginBalance = (sheet = "Regular", i) => {
+		if (i + 1 !== 2) {
+			const worksheet = workbook.getWorksheet(sheet);
+			const eCell = worksheet.getCell(`E${i}`);
+			const cell = worksheet.getCell(`B${i + 1}`);
+
+			cell.value = eCell.value;
 		}
 	};
 	const insertFormulas = (
