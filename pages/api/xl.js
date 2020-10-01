@@ -1,5 +1,6 @@
 import Excel from "exceljs";
 import XLSX from "xlsx";
+const puppeteer = require("puppeteer");
 export default (req, res) => {
 	// res.statusCode = 200;
 	res.setHeader("Content-Type", "application/json");
@@ -25,6 +26,15 @@ export default (req, res) => {
 	];
 	const RegSheet = workbook.addWorksheet("Regular");
 	const PremiumSheet = workbook.addWorksheet("Premium");
+
+	const launchBrowser = async () => {
+		const browser = await puppeteer.launch({ headless: false, slowMo: 100 });
+		const page = await browser.newPage();
+		console.log("launching browser");
+		await page.goto("https://myfueltanksolutions.com");
+		await page.waitForSelector("input");
+		await page.type("input[name=CompanyID]", "NELT");
+	};
 
 	const formulas = ["f-e", "e", "b+c-d", "g+h"];
 	const getFormula = (formula, index) => {
@@ -464,6 +474,8 @@ export default (req, res) => {
 	insertRows();
 
 	const fileName = `LQ.${state.month}.${state.year}` + ".xlsx";
+
+	launchBrowser();
 	workbook.xlsx.writeFile(fileName);
 	res.send("Saved as " + fileName);
 };
