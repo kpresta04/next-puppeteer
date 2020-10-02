@@ -1,6 +1,7 @@
 import Excel from "exceljs";
 import XLSX from "xlsx";
 const puppeteer = require("puppeteer");
+require("dotenv").config();
 export default (req, res) => {
 	// res.statusCode = 200;
 	res.setHeader("Content-Type", "application/json");
@@ -30,10 +31,14 @@ export default (req, res) => {
 	const launchBrowser = async () => {
 		const browser = await puppeteer.launch({ headless: false, slowMo: 100 });
 		const page = await browser.newPage();
-		console.log("launching browser");
+
 		await page.goto("https://myfueltanksolutions.com");
 		await page.waitForSelector("input");
 		await page.type("input[name=CompanyID]", "NELT");
+		await page.type("input[name=UserID]", "terry");
+
+		await page.type("input[name=Password]", process.env.PASSWORD);
+		await page.click("img[name=btnSubmit]");
 	};
 
 	const formulas = ["f-e", "e", "b+c-d", "g+h"];
