@@ -485,7 +485,6 @@ export default (req, res) => {
 			let endStartIndex = 4;
 
 			const worksheet = workbook.getWorksheet(PremiumOrRegular);
-			// for (let i = 1; i <= state.monthLength; i++) {
 
 			for (let i = 1; i <= state.monthLength; i++) {
 				let dipsValue = worksheet.getCell(`F${i + 1}`).value;
@@ -502,13 +501,6 @@ export default (req, res) => {
 				delivStartIndex += 6;
 				endStartIndex += 6;
 			}
-			// state.daysInMonthArray.forEach(async (day) => {
-			// 	await frameContext.type(
-			// 		`#text${salesStartIndex}`,
-			// 		state.premiumTotal[day - 1].toString()
-			// 	);
-			// 	salesStartIndex += 6;
-			// });
 		};
 
 		await page.goto("https://myfueltanksolutions.com");
@@ -562,6 +554,10 @@ export default (req, res) => {
 		botContext = await getFrameContext("rhf", "data_contents");
 		// await botContext.type("#text2", "4");
 		await enterData(botContext);
+		await page.click("img[name=btnSaveNextTank]");
+		await page.waitForSelector("frame");
+
+		botContext = await getFrameContext("rhf", "data_contents");
 	};
 
 	workbook.xlsx.writeFile(fileName);
