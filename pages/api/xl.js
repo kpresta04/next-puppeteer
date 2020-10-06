@@ -32,6 +32,46 @@ export default (req, res) => {
 		const browser = await puppeteer.launch({ headless: false, slowMo: 50 });
 		const page = await browser.newPage();
 
+		const getFrameContext = async (firstFrame, secondFrame) => {
+			const elementHandle = await page.$(`frame[name=${firstFrame}]`);
+			const frame = await elementHandle.contentFrame();
+
+			const botFrame = await frame.$(`frame[name=${secondFrame}]`);
+			const botContext = await botFrame.contentFrame();
+			return botContext;
+		};
+
+		const enterData = async (frameContext, PremiumOrRegular = "Premium") => {
+			let salesStartIndex = 2;
+			let delivStartIndex = 3;
+			let endStartIndex = 4;
+
+			for (let i = 1; i <= state.monthLength; i++) {
+				await frameContext.type(
+					`#text${salesStartIndex}`,
+					state.premiumTotal[i - 1].toString()
+				);
+				await frameContext.type(
+					`#text${delivStartIndex}`,
+					state.premDeliv[i - 1].toString()
+				);
+				// await frameContext.type(
+				// 	`#text${endStartIndex}`,
+				// 	state.premDeliv[i - 1].toString()
+				// );
+				salesStartIndex += 6;
+				delivStartIndex += 6;
+				endStartIndex += 6;
+			}
+			// state.daysInMonthArray.forEach(async (day) => {
+			// 	await frameContext.type(
+			// 		`#text${salesStartIndex}`,
+			// 		state.premiumTotal[day - 1].toString()
+			// 	);
+			// 	salesStartIndex += 6;
+			// });
+		};
+
 		await page.goto("https://myfueltanksolutions.com");
 		await page.waitForSelector("input");
 		await page.type("input[name=CompanyID]", "NELT");
@@ -44,29 +84,13 @@ export default (req, res) => {
 			"https://myfueltanksolutions.com/vertical.asp?type=cust&urls=htmltree.asp|home.asp"
 		);
 		await page.waitForSelector("frame");
-		// await page.goto(
-		// 	"https://myfueltanksolutions.com/vertical.asp?urls=htmltree.asp|site.asp?sSite=AAA"
-		// );
-		// let text = "Sites";
-		// await page.click("a[href='director.asp?type=site']");
-		// await page.waitForSelector("frame");
-		// await page.goto(
-		// 	"https://myfueltanksolutions.com/vertical.asp?urls=htmltree.asp|td_tankdata.asp?Dates=,"
-		// );
 
-		// await page.goto(
-		// 	"https://myfueltanksolutions.com/vertical.asp?urls=htmltree.asp|td_tankdata.asp?Dates=,"
-		// );
 		await page.goto(
 			"https://myfueltanksolutions.com/vertical.asp?urls=htmltree.asp|horizontal.asp?urls=listtool.asp?list=site|list.asp?type=site"
 		);
 		await page.waitForSelector("frame");
 
-		let elementHandle = await page.$("frame[name=rhf]");
-		let frame = await elementHandle.contentFrame();
-
-		let botFrame = await frame.$("frame[name=bot]");
-		let botContext = await botFrame.contentFrame();
+		let botContext = await getFrameContext("rhf", "bot");
 
 		await botContext.evaluate(() => {
 			const elements = [...document.querySelectorAll("a")];
@@ -75,11 +99,8 @@ export default (req, res) => {
 			targetElement && targetElement.click();
 		});
 		await page.waitForSelector("frame");
-		elementHandle = await page.$("frame[name=lhf]");
-		frame = await elementHandle.contentFrame();
+		botContext = await getFrameContext("lhf", "bot");
 
-		botFrame = await frame.$("frame[name=bot]");
-		botContext = await botFrame.contentFrame();
 		await botContext.evaluate(() => {
 			const elements = [...document.querySelectorAll("a")];
 
@@ -88,15 +109,20 @@ export default (req, res) => {
 			);
 			targetElement && targetElement.click();
 		});
+		await page.waitForSelector("frame");
 
-		// await page.goto(
-		// 	"https://myfueltanksolutions.com/vertical.asp?urls=htmltree.asp|site.asp?sSite=AAA"
-		// );
-		// await page.waitForSelector("frame");
+		botContext = await getFrameContext("rhf", "data_header");
+		await botContext.select("select[name=Start_Month]", `${state.month}`);
+		await botContext.select("select[name=Start_Day]", "1");
+		await botContext.select("select[name=End_Month]", `${state.month}`);
+		await botContext.select("select[name=End_Day]", `${state.monthLength}`);
 
-		// await page.goto(
-		// 	"https://myfueltanksolutions.com/vertical.asp?urls=htmltree.asp|td_tankdata.asp?Dates=,"
-		// );
+		await botContext.click("img[name=btnSubmit2]");
+		await page.waitForSelector("frame");
+
+		botContext = await getFrameContext("rhf", "data_contents");
+		// await botContext.type("#text2", "4");
+		await enterData(botContext);
 	};
 
 	const formulas = ["f-e", "e", "b+c-d", "g+h"];
