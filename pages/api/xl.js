@@ -29,7 +29,7 @@ export default (req, res) => {
 	const PremiumSheet = workbook.addWorksheet("Premium");
 
 	const launchBrowser = async () => {
-		const browser = await puppeteer.launch({ headless: false, slowMo: 100 });
+		const browser = await puppeteer.launch({ headless: false, slowMo: 50 });
 		const page = await browser.newPage();
 
 		await page.goto("https://myfueltanksolutions.com");
@@ -39,6 +39,64 @@ export default (req, res) => {
 
 		await page.type("input[name=Password]", process.env.PASSWORD);
 		await page.click("img[name=btnSubmit]");
+		await page.waitForSelector("span");
+		await page.goto(
+			"https://myfueltanksolutions.com/vertical.asp?type=cust&urls=htmltree.asp|home.asp"
+		);
+		await page.waitForSelector("frame");
+		// await page.goto(
+		// 	"https://myfueltanksolutions.com/vertical.asp?urls=htmltree.asp|site.asp?sSite=AAA"
+		// );
+		// let text = "Sites";
+		// await page.click("a[href='director.asp?type=site']");
+		// await page.waitForSelector("frame");
+		// await page.goto(
+		// 	"https://myfueltanksolutions.com/vertical.asp?urls=htmltree.asp|td_tankdata.asp?Dates=,"
+		// );
+
+		// await page.goto(
+		// 	"https://myfueltanksolutions.com/vertical.asp?urls=htmltree.asp|td_tankdata.asp?Dates=,"
+		// );
+		await page.goto(
+			"https://myfueltanksolutions.com/vertical.asp?urls=htmltree.asp|horizontal.asp?urls=listtool.asp?list=site|list.asp?type=site"
+		);
+		await page.waitForSelector("frame");
+
+		let elementHandle = await page.$("frame[name=rhf]");
+		let frame = await elementHandle.contentFrame();
+
+		let botFrame = await frame.$("frame[name=bot]");
+		let botContext = await botFrame.contentFrame();
+
+		await botContext.evaluate(() => {
+			const elements = [...document.querySelectorAll("a")];
+
+			const targetElement = elements.find((e) => e.innerText.includes("AAA"));
+			targetElement && targetElement.click();
+		});
+		await page.waitForSelector("frame");
+		elementHandle = await page.$("frame[name=lhf]");
+		frame = await elementHandle.contentFrame();
+
+		botFrame = await frame.$("frame[name=bot]");
+		botContext = await botFrame.contentFrame();
+		await botContext.evaluate(() => {
+			const elements = [...document.querySelectorAll("a")];
+
+			const targetElement = elements.find((e) =>
+				e.innerText.includes("Inventory View")
+			);
+			targetElement && targetElement.click();
+		});
+
+		// await page.goto(
+		// 	"https://myfueltanksolutions.com/vertical.asp?urls=htmltree.asp|site.asp?sSite=AAA"
+		// );
+		// await page.waitForSelector("frame");
+
+		// await page.goto(
+		// 	"https://myfueltanksolutions.com/vertical.asp?urls=htmltree.asp|td_tankdata.asp?Dates=,"
+		// );
 	};
 
 	const formulas = ["f-e", "e", "b+c-d", "g+h"];
