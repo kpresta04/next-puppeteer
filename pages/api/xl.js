@@ -28,103 +28,6 @@ export default (req, res) => {
 	const RegSheet = workbook.addWorksheet("Regular");
 	const PremiumSheet = workbook.addWorksheet("Premium");
 
-	const launchBrowser = async () => {
-		const browser = await puppeteer.launch({ headless: false, slowMo: 50 });
-		const page = await browser.newPage();
-
-		const getFrameContext = async (firstFrame, secondFrame) => {
-			const elementHandle = await page.$(`frame[name=${firstFrame}]`);
-			const frame = await elementHandle.contentFrame();
-
-			const botFrame = await frame.$(`frame[name=${secondFrame}]`);
-			const botContext = await botFrame.contentFrame();
-			return botContext;
-		};
-
-		const enterData = async (frameContext, PremiumOrRegular = "Premium") => {
-			let salesStartIndex = 2;
-			let delivStartIndex = 3;
-			let endStartIndex = 4;
-
-			for (let i = 1; i <= state.monthLength; i++) {
-				await frameContext.type(
-					`#text${salesStartIndex}`,
-					state.premiumTotal[i - 1].toString()
-				);
-				await frameContext.type(
-					`#text${delivStartIndex}`,
-					state.premDeliv[i - 1].toString()
-				);
-				// await frameContext.type(
-				// 	`#text${endStartIndex}`,
-				// 	state.premDeliv[i - 1].toString()
-				// );
-				salesStartIndex += 6;
-				delivStartIndex += 6;
-				endStartIndex += 6;
-			}
-			// state.daysInMonthArray.forEach(async (day) => {
-			// 	await frameContext.type(
-			// 		`#text${salesStartIndex}`,
-			// 		state.premiumTotal[day - 1].toString()
-			// 	);
-			// 	salesStartIndex += 6;
-			// });
-		};
-
-		await page.goto("https://myfueltanksolutions.com");
-		await page.waitForSelector("input");
-		await page.type("input[name=CompanyID]", "NELT");
-		await page.type("input[name=UserID]", "terry");
-
-		await page.type("input[name=Password]", process.env.PASSWORD);
-		await page.click("img[name=btnSubmit]");
-		await page.waitForSelector("span");
-		await page.goto(
-			"https://myfueltanksolutions.com/vertical.asp?type=cust&urls=htmltree.asp|home.asp"
-		);
-		await page.waitForSelector("frame");
-
-		await page.goto(
-			"https://myfueltanksolutions.com/vertical.asp?urls=htmltree.asp|horizontal.asp?urls=listtool.asp?list=site|list.asp?type=site"
-		);
-		await page.waitForSelector("frame");
-
-		let botContext = await getFrameContext("rhf", "bot");
-
-		await botContext.evaluate(() => {
-			const elements = [...document.querySelectorAll("a")];
-
-			const targetElement = elements.find((e) => e.innerText.includes("AAA"));
-			targetElement && targetElement.click();
-		});
-		await page.waitForSelector("frame");
-		botContext = await getFrameContext("lhf", "bot");
-
-		await botContext.evaluate(() => {
-			const elements = [...document.querySelectorAll("a")];
-
-			const targetElement = elements.find((e) =>
-				e.innerText.includes("Inventory View")
-			);
-			targetElement && targetElement.click();
-		});
-		await page.waitForSelector("frame");
-
-		botContext = await getFrameContext("rhf", "data_header");
-		await botContext.select("select[name=Start_Month]", `${state.month}`);
-		await botContext.select("select[name=Start_Day]", "1");
-		await botContext.select("select[name=End_Month]", `${state.month}`);
-		await botContext.select("select[name=End_Day]", `${state.monthLength}`);
-
-		await botContext.click("img[name=btnSubmit2]");
-		await page.waitForSelector("frame");
-
-		botContext = await getFrameContext("rhf", "data_contents");
-		// await botContext.type("#text2", "4");
-		await enterData(botContext);
-	};
-
 	const formulas = ["f-e", "e", "b+c-d", "g+h"];
 	const getFormula = (formula, index) => {
 		switch (formula) {
@@ -563,8 +466,105 @@ export default (req, res) => {
 	insertRows();
 
 	const fileName = `LQ.${state.month}.${state.year}` + ".xlsx";
+	const launchBrowser = async () => {
+		const browser = await puppeteer.launch({ headless: false, slowMo: 50 });
+		const page = await browser.newPage();
 
-	launchBrowser();
+		const getFrameContext = async (firstFrame, secondFrame) => {
+			const elementHandle = await page.$(`frame[name=${firstFrame}]`);
+			const frame = await elementHandle.contentFrame();
+
+			const botFrame = await frame.$(`frame[name=${secondFrame}]`);
+			const botContext = await botFrame.contentFrame();
+			return botContext;
+		};
+
+		const enterData = async (frameContext, PremiumOrRegular = "Premium") => {
+			let salesStartIndex = 2;
+			let delivStartIndex = 3;
+			let endStartIndex = 4;
+
+			const worksheet = workbook.getWorksheet(PremiumOrRegular);
+			// for (let i = 1; i <= state.monthLength; i++) {
+
+			for (let i = 1; i <= state.monthLength; i++) {
+				let dipsValue = worksheet.getCell(`F${i + 1}`).value;
+				await frameContext.type(
+					`#text${salesStartIndex}`,
+					state.premiumTotal[i - 1].toString()
+				);
+				await frameContext.type(
+					`#text${delivStartIndex}`,
+					state.premDeliv[i - 1].toString()
+				);
+				await frameContext.type(`#text${endStartIndex}`, dipsValue.toString());
+				salesStartIndex += 6;
+				delivStartIndex += 6;
+				endStartIndex += 6;
+			}
+			// state.daysInMonthArray.forEach(async (day) => {
+			// 	await frameContext.type(
+			// 		`#text${salesStartIndex}`,
+			// 		state.premiumTotal[day - 1].toString()
+			// 	);
+			// 	salesStartIndex += 6;
+			// });
+		};
+
+		await page.goto("https://myfueltanksolutions.com");
+		await page.waitForSelector("input");
+		await page.type("input[name=CompanyID]", "NELT");
+		await page.type("input[name=UserID]", "terry");
+
+		await page.type("input[name=Password]", process.env.PASSWORD);
+		await page.click("img[name=btnSubmit]");
+		await page.waitForSelector("span");
+		await page.goto(
+			"https://myfueltanksolutions.com/vertical.asp?type=cust&urls=htmltree.asp|home.asp"
+		);
+		await page.waitForSelector("frame");
+
+		await page.goto(
+			"https://myfueltanksolutions.com/vertical.asp?urls=htmltree.asp|horizontal.asp?urls=listtool.asp?list=site|list.asp?type=site"
+		);
+		await page.waitForSelector("frame");
+
+		let botContext = await getFrameContext("rhf", "bot");
+
+		await botContext.evaluate(() => {
+			const elements = [...document.querySelectorAll("a")];
+
+			const targetElement = elements.find((e) => e.innerText.includes("AAA"));
+			targetElement && targetElement.click();
+		});
+		await page.waitForSelector("frame");
+		botContext = await getFrameContext("lhf", "bot");
+
+		await botContext.evaluate(() => {
+			const elements = [...document.querySelectorAll("a")];
+
+			const targetElement = elements.find((e) =>
+				e.innerText.includes("Inventory View")
+			);
+			targetElement && targetElement.click();
+		});
+		await page.waitForSelector("frame");
+
+		botContext = await getFrameContext("rhf", "data_header");
+		await botContext.select("select[name=Start_Month]", `${state.month}`);
+		await botContext.select("select[name=Start_Day]", "1");
+		await botContext.select("select[name=End_Month]", `${state.month}`);
+		await botContext.select("select[name=End_Day]", `${state.monthLength}`);
+
+		await botContext.click("img[name=btnSubmit2]");
+		await page.waitForSelector("frame");
+
+		botContext = await getFrameContext("rhf", "data_contents");
+		// await botContext.type("#text2", "4");
+		await enterData(botContext);
+	};
+
 	workbook.xlsx.writeFile(fileName);
+	launchBrowser();
 	res.send("Saved as " + fileName);
 };
