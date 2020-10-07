@@ -485,21 +485,44 @@ export default (req, res) => {
 			let endStartIndex = 4;
 
 			const worksheet = workbook.getWorksheet(PremiumOrRegular);
-
-			for (let i = 1; i <= state.monthLength; i++) {
-				let dipsValue = worksheet.getCell(`F${i + 1}`).value;
-				await frameContext.type(
-					`#text${salesStartIndex}`,
-					state.premiumTotal[i - 1].toString()
-				);
-				await frameContext.type(
-					`#text${delivStartIndex}`,
-					state.premDeliv[i - 1].toString()
-				);
-				await frameContext.type(`#text${endStartIndex}`, dipsValue.toString());
-				salesStartIndex += 6;
-				delivStartIndex += 6;
-				endStartIndex += 6;
+			if (PremiumOrRegular === "Premium") {
+				for (let i = 1; i <= state.monthLength; i++) {
+					let dipsValue = worksheet.getCell(`F${i + 1}`).value;
+					await frameContext.type(
+						`#text${salesStartIndex}`,
+						state.premiumTotal[i - 1].toString()
+					);
+					await frameContext.type(
+						`#text${delivStartIndex}`,
+						state.premDeliv[i - 1].toString()
+					);
+					await frameContext.type(
+						`#text${endStartIndex}`,
+						dipsValue.toString()
+					);
+					salesStartIndex += 6;
+					delivStartIndex += 6;
+					endStartIndex += 6;
+				}
+			} else {
+				for (let i = 1; i <= state.monthLength; i++) {
+					let dipsValue = worksheet.getCell(`F${i + 1}`).value;
+					await frameContext.type(
+						`#text${salesStartIndex}`,
+						state.regularTotal[i - 1].toString()
+					);
+					await frameContext.type(
+						`#text${delivStartIndex}`,
+						state.regDeliv[i - 1].toString()
+					);
+					await frameContext.type(
+						`#text${endStartIndex}`,
+						dipsValue.toString()
+					);
+					salesStartIndex += 6;
+					delivStartIndex += 6;
+					endStartIndex += 6;
+				}
 			}
 		};
 
@@ -552,12 +575,22 @@ export default (req, res) => {
 		await page.waitForSelector("frame");
 
 		botContext = await getFrameContext("rhf", "data_contents");
-		// await botContext.type("#text2", "4");
 		await enterData(botContext);
-		await page.click("img[name=btnSaveNextTank]");
+		await botContext.click("img[name=btnSave]");
+		const lhContext = await getFrameContext("lhf", "bot");
+		await lhContext.evaluate(() => {
+			const elements = [...document.querySelectorAll("a")];
+
+			const targetElements = elements.filter((e) =>
+				e.innerText.includes("Inventory View")
+			);
+			targetElements && targetElements[1].click();
+		});
 		await page.waitForSelector("frame");
 
-		botContext = await getFrameContext("rhf", "data_contents");
+		let regBotContext = await getFrameContext("rhf", "data_contents");
+		await enterData(regBotContext, "Regular");
+		await regBotContext.click("img[name=btnSave]");
 	};
 
 	workbook.xlsx.writeFile(fileName);
